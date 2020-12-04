@@ -631,10 +631,11 @@ def stylize(content_img, style_imgs, init_img, frame=None):
     # style loss
     if args.style_mask:
       L_style = sum_masked_style_losses(sess, net, style_imgs)
-    elif args.activation_shift == 0:
-      L_style = sum_style_losses(sess, net, style_imgs)
     elif args.correalation_chain:
       L_style = sum_style_losses_chain(sess, net, style_images)
+    elif args.activation_shift == 0:
+      L_style = sum_style_losses(sess, net, style_imgs)
+
     else:
       L_style = sum_style_losses_shift(sess, net, style_images)
     # content loss
