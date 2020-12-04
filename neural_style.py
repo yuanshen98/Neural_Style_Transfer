@@ -211,6 +211,9 @@ def parse_args():
     default=800,
     help='Maximum number of optimizer iterations for each frame after the first frame. (default: %(default)s)')
 
+  parser.add_argument('--activation_shift', type=int, default=0)
+
+  parser.add_argument('--correlation_chain', action='store_true')
   args = parser.parse_args()
 
   # normalize weights
@@ -366,11 +369,39 @@ def style_layer_loss(a, x):
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
   return loss
 
+def style_layer_loss_chain(a, x_prev, x_curr):
+  _, h, w, d = a.get_shape()
+  M = h * w
+  N = d
+  A = gram_matrix(a, M, N)
+  G = gram_matrix_chain(x_prev, x_curr, M, N)
+  loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
+  return loss
+
+def style_layer_loss_shift(a, x, s):
+  _, h, w, d = a.get_shape()
+  M = h * w
+  N = d
+  A = gram_matrix(a, M, N, s)
+  G = gram_matrix(x, M, N, s)
+  loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
+  return loss
+
 def gram_matrix(x, area, depth):
   F = tf.reshape(x, (area, depth))
   G = tf.matmul(tf.transpose(F), F)
   return G
 
+def gram_matrix_shift(x, area, depth, s):
+  F = tf.reshape(x, (area, depth))
+  G = tf.matmul(tf.transpose(F+s), F+s)
+  return G
+
+def gram_matrix_chain(x_prev, x_curr, area, depth):
+  F1 = tf.reshape(x_prev, (area, depth))
+  F2 = tf.reshape(x_curr, (area, depth))
+  G = tf.matmul(tf.transpose(F1), F2)
+  return G
 def mask_style_layer(a, x, mask_img):
   _, h, w, d = a.get_shape()
   mask = get_mask_image(mask_img, w.value, h.value)
@@ -414,6 +445,52 @@ def sum_style_losses(sess, net, style_imgs):
       x = net[layer]
       a = tf.convert_to_tensor(a)
       style_loss += style_layer_loss(a, x) * weight
+    style_loss /= float(len(args.style_layers))
+    total_style_loss += (style_loss * img_weight)
+  total_style_loss /= float(len(style_imgs))
+  return total_style_loss
+
+#OPT 3.3
+def sum_style_losses_shift(sess, net, style_imgs):
+  print ("****************")
+  print ("Working with Style Shift")
+  print ("****************")
+  total_style_loss = 0.
+  weights = args.style_imgs_weights
+  shift = args.activation_shift
+  for img, img_weight in zip(style_imgs, weights):
+    sess.run(net['input'].assign(img))
+    style_loss = 0.
+    for layer, weight in zip(args.style_layers, args.style_layer_weights):
+      a = sess.run(net[layer])
+      x = net[layer]
+      a = tf.convert_to_tensor(a)
+      style_loss += style_layer_loss_shift(a, x, shift) * weight
+    style_loss /= float(len(args.style_layers))
+    total_style_loss += (style_loss * img_weight)
+  total_style_loss /= float(len(style_imgs))
+  return total_style_loss
+
+#OPT 3.5
+def sum_style_losses_chain(sess, net, style_imgs):
+  print ("****************")
+  print ("Working with Style Chain")
+  print ("****************")
+  total_style_loss = 0.
+  weights = args.style_imgs_weights
+  for img, img_weight in zip(style_imgs, weights):
+    sess.run(net['input'].assign(img))
+    style_loss = 0.
+    for count, layer, weight in enum(zip(args.style_layers, args.style_layer_weights)):
+      if count == 0:
+        #save F
+        x_prev = net[layer]
+        continue
+      a = sess.run(net[layer])
+      x_curr = net[layer]
+      a = tf.convert_to_tensor(a)
+      style_loss += style_layer_loss_chain(a, x_prev, x_curr) * weight
+      x_prev = x_curr
     style_loss /= float(len(args.style_layers))
     total_style_loss += (style_loss * img_weight)
   total_style_loss /= float(len(style_imgs))
@@ -554,9 +631,12 @@ def stylize(content_img, style_imgs, init_img, frame=None):
     # style loss
     if args.style_mask:
       L_style = sum_masked_style_losses(sess, net, style_imgs)
-    else:
+    elif args.activation_shift == 0:
       L_style = sum_style_losses(sess, net, style_imgs)
-    
+    elif args.correalation_chain:
+      L_style = sum_style_losses_chain(sess, net, style_images)
+    else:
+      L_style = sum_style_losses_shift(sess, net, style_images)
     # content loss
     L_content = sum_content_losses(sess, net, content_img)
     
