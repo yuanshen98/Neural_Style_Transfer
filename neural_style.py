@@ -481,7 +481,7 @@ def sum_style_losses_chain(sess, net, style_imgs):
   for img, img_weight in zip(style_imgs, weights):
     sess.run(net['input'].assign(img))
     style_loss = 0.
-    for count, layer, weight in enumerate(zip(args.style_layers, args.style_layer_weights)):
+    for count, (layer, weight) in enumerate(zip(args.style_layers, args.style_layer_weights)):
       if count == 0:
         #save F
         x_prev = net[layer]
