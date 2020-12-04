@@ -374,6 +374,9 @@ def style_layer_loss_chain(a, x_prev, x_curr):
   M = h * w
   N = d
   A = gram_matrix(a, M, N)
+
+  print (tf.shape(a))
+
   G = gram_matrix_chain(x_prev, x_curr, M, N)
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
   return loss
@@ -382,7 +385,7 @@ def style_layer_loss_shift(a, x, s):
   _, h, w, d = a.get_shape()
   M = h * w
   N = d
-  A = gram_matrix_shift(a, M, N, s)
+  A = gram_matrix(a, M, N)
   G = gram_matrix_shift(x, M, N, s)
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
   return loss
@@ -398,10 +401,16 @@ def gram_matrix_shift(x, area, depth, s):
   return G
 
 def gram_matrix_chain(x_prev, x_curr, area, depth):
-  F1 = tf.image.resize(x_prev, (area, depth))
-  F2 = tf.image.resize(x_curr, (area, depth))
+  _, h1, w1, d1 = x_prev.get_shape()
+  _, h2, w2, d2 = x_curr.get_shape()
+  factor = int(d2/d1)
+  F1 = tf.image.resize(x_prev, (h2*factor, w2))
+  F1 = tf.reshape(F1, (area, depth))
+  F2 = tf.reshape(x_curr, (area, depth))
+  #F2 = tf.image.resize(F2, (area1, depth1))
   G = tf.matmul(tf.transpose(F1), F2)
   return G
+
 def mask_style_layer(a, x, mask_img):
   _, h, w, d = a.get_shape()
   mask = get_mask_image(mask_img, w.value, h.value)
