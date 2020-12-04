@@ -398,8 +398,8 @@ def gram_matrix_shift(x, area, depth, s):
   return G
 
 def gram_matrix_chain(x_prev, x_curr, area, depth):
-  F1 = tf.reshape(x_prev, (area, depth))
-  F2 = tf.reshape(x_curr, (area, depth))
+  F1 = tf.image.resize(x_prev, (area, depth))
+  F2 = tf.image.resize(x_curr, (area, depth))
   G = tf.matmul(tf.transpose(F1), F2)
   return G
 def mask_style_layer(a, x, mask_img):
