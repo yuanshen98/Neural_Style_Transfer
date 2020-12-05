@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np 
 import scipy.io  
 import argparse 
@@ -7,7 +7,6 @@ import errno
 import time                       
 import cv2
 import os
-import tensorflow
 '''
   parsing and configuration
 '''
