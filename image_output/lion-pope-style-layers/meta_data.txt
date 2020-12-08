@@ -1,0 +1,12 @@
+image_name: lion-pope-style-layers
+content: lion.jpg
+styles[0]: 1.0 * pope.jpg
+init_type: content
+content_weight: 5.0
+style_weight: 10000.0
+tv_weight: 0.001
+content_layers: ['conv4_2']
+style_layers: ['relu1_1', 'relu2_1', 'relu3_1', 'relu3_2', 'relu3_3', 'relu4_1', 'relu4_2', 'relu4_3', 'relu5_1', 'relu5_2', 'relu5_3']
+optimizer_type: adam
+max_iterations: 2500
+max_image_size: 1000
