@@ -368,7 +368,7 @@ def style_layer_loss(a, x):
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
   return loss
 
-def style_layer_loss_chain(a, x_prev, x_curr):
+def style_layer_loss_chain(a, x_prev, x_curr, shift):
   _, h, w, d = a.get_shape()
   M = h * w
   N = d
@@ -376,7 +376,7 @@ def style_layer_loss_chain(a, x_prev, x_curr):
 
   print (tf.shape(a))
 
-  G = gram_matrix_chain(x_prev, x_curr, M, N)
+  G = gram_matrix_chain(x_prev, x_curr, M, N, shift)
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
   return loss
 
@@ -399,18 +399,18 @@ def gram_matrix_shift(x, area, depth, s):
   G = tf.matmul(tf.transpose(F+s), F+s)
   return G
 
-def gram_matrix_chain(x_prev, x_curr, area, depth):
+def gram_matrix_chain(x_prev, x_curr, area, depth, shift):
   _, h1, w1, d1 = x_prev.get_shape()
   _, h2, w2, d2 = x_curr.get_shape()
   factor = int(d2/d1)
   #F1 = tf.image.resize(x_prev, (h2*factor, w2))
   F1 = tf.reshape(x_prev, (h1*w1, d1))
   F1 = F1[tf.newaxis, ..., tf.newaxis]
-  F1 = tf.image.resize(F1, (area, depth))
+  F1 = tf.image.resize_with_pad(F1, (area, depth))
   F1 = tf.reshape(F1, (area, depth))
   F2 = tf.reshape(x_curr, (area, depth))
   #F2 = tf.image.resize(F2, (area1, depth1))
-  G = tf.matmul(tf.transpose(F1), F2)
+  G = tf.matmul(tf.transpose(F1+shift), F2+shift)
   return G
 
 def mask_style_layer(a, x, mask_img):
@@ -489,6 +489,7 @@ def sum_style_losses_chain(sess, net, style_imgs):
   print ("****************")
   total_style_loss = 0.
   weights = args.style_imgs_weights
+  shift = args.activation_shift
   for img, img_weight in zip(style_imgs, weights):
     sess.run(net['input'].assign(img))
     style_loss = 0.
@@ -500,7 +501,7 @@ def sum_style_losses_chain(sess, net, style_imgs):
       a = sess.run(net[layer])
       x_curr = net[layer]
       a = tf.convert_to_tensor(a)
-      style_loss += style_layer_loss_chain(a, x_prev, x_curr) * weight
+      style_loss += style_layer_loss_chain(a, x_prev, x_curr, shift) * weight
       x_prev = x_curr
     style_loss /= float(len(args.style_layers))
     total_style_loss += (style_loss * img_weight)
