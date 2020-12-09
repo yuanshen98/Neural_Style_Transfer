@@ -1,5 +1,5 @@
 image_name: toque1024-Manet1-activation-shift-neg10
-content: tubingen.jpg
+content: toque1024.jpg
 styles[0]: 1.0 * Manet1.jpg
 init_type: content
 content_weight: 5.0
