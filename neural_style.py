@@ -404,11 +404,11 @@ def gram_matrix_chain(x_prev, x_curr, area, depth, shift):
   _, h2, w2, d2 = x_curr.get_shape()
   factor = int(d2/d1)
   #F1 = tf.image.resize(x_prev, (h2*factor, w2))
-  F1 = tf.reshape(x_prev, (h1*w1, d1))
+  F1 = tf.reshape(x_prev, (d1, h1*w1))
   F1 = F1[tf.newaxis, ..., tf.newaxis]
-  F1 = tf.image.resize_image_with_pad(F1, area, depth)
-  F1 = tf.reshape(F1, (area, depth))
-  F2 = tf.reshape(x_curr, (area, depth))
+  F1 = tf.image.resize(F1, (depth, area))
+  F1 = tf.reshape(F1, (depth, area))
+  F2 = tf.reshape(x_curr, (depth, area))
   #F2 = tf.image.resize(F2, (area1, depth1))
   G = tf.matmul(tf.transpose(F1+shift), F2+shift)
   return G
