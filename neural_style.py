@@ -372,9 +372,9 @@ def style_layer_loss_chain(a, x_prev, x_curr, shift):
   _, h, w, d = a.get_shape()
   M = h * w
   N = d
-  A = gram_matrix(a, M, N)
+  A = gram_matrix(a, N, M)
 
-  print (tf.shape(a))
+
 
   G = gram_matrix_chain(x_prev, x_curr, M, N, shift)
   loss = (1./(4 * N**2 * M**2)) * tf.reduce_sum(tf.pow((G - A), 2))
