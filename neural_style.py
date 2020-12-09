@@ -372,7 +372,7 @@ def style_layer_loss_chain(a, x_prev, x_curr, shift):
   _, h, w, d = a.get_shape()
   M = h * w
   N = d
-  A = gram_matrix(a, N, M)
+  A = gram_matrix(a, M, N)
 
 
 
@@ -406,9 +406,9 @@ def gram_matrix_chain(x_prev, x_curr, area, depth, shift):
   #F1 = tf.image.resize(x_prev, (h2*factor, w2))
   F1 = tf.reshape(x_prev, (d1, h1*w1))
   F1 = F1[tf.newaxis, ..., tf.newaxis]
-  F1 = tf.image.resize(F1, (depth, area))
-  F1 = tf.reshape(F1, (depth, area))
-  F2 = tf.reshape(x_curr, (depth, area))
+  F1 = tf.image.resize(F1, (area, depth))
+  F1 = tf.reshape(F1, (area, depth))
+  F2 = tf.reshape(x_curr, (area, depth))
   #F2 = tf.image.resize(F2, (area1, depth1))
   G = tf.matmul(tf.transpose(F1+shift), F2+shift)
   return G
