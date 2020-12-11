@@ -9,19 +9,19 @@ This implementation applies some optimizations from paper [Improving the Neural 
 </p>
 
 ### Evaluation for style layers
-To use multiple layers for style loss, use argument `--style_layers layers`
+To urun with multiple layers for style loss, use argument `--style_layers layers`
 <p align="center">
 <img src="examples/evaluation/images/image5.png">
 </p>
 
 ### Evaluation for activation shift
-To use activation shift, use argument `--activation_shift value`. *Default*: `0`
+To run with activation shift, use argument `--activation_shift value`. *Default*: `0`
 <p align="center">
 <img src="examples/evaluation/images/image7.png">
 </p>
 
 ### Evaluation for correlation chain
-To use activation shift, use argument `--correlation_chain`. 
+To run with correlation chain, use argument `--correlation_chain`. 
 <p align="center">
 <img src="examples/evaluation/images/image1.png">
 </p>
