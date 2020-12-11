@@ -1,4 +1,16 @@
 # neural-style-tf
+This implementation applies some optimizations from paper [Improving the Neural Algorithm of Artistic Style](https://arxiv.org/abs/1605.04603) to the implementation of the original algorithm available [here](https://github.com/cysmith/neural-style-tf)
+### Examples 
+<p align="center">
+<img src="examples/evaluation/images/image2.png">
+<img src="examples/evaluation/images/image3.png">
+<img src="examples/evaluation/images/image4.png">
+<img src="examples/evaluation/images/image6.png">
+</p>
+### Evaluation for style layers
+
+### Evaluation for activation shift
+### Evaluation for correlation chain
 
 This is a TensorFlow implementation of several techniques described in the papers: 
 * [Image Style Transfer Using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
