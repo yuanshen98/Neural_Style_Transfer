@@ -1,5 +1,5 @@
 # neural-style-tf
-This implementation applies some optimizations from paper [Improving the Neural Algorithm of Artistic Style](https://arxiv.org/abs/1605.04603) to the implementation of the original algorithm available [here](https://github.com/cysmith/neural-style-tf)
+This implementation applies some optimizations from paper [Improving the Neural Algorithm of Artistic Style](https://arxiv.org/abs/1605.04603) to the implementation of the original algorithm available [here](https://github.com/cysmith/neural-style-tf).
 ### Examples 
 <p align="center">
 <img src="examples/evaluation/images/image2.png">
