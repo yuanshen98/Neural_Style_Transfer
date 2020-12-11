@@ -13,11 +13,13 @@ To use multiple layers for style loss, use argument `--style_layers layers`
 <p align="center">
 <img src="examples/evaluation/images/image5.png">
 </p>
+
 ### Evaluation for activation shift
 To use activation shift, use argument `--activation_shift value`. *Default*: `0`
 <p align="center">
 <img src="examples/evaluation/images/image7.png">
 </p>
+
 ### Evaluation for correlation chain
 To use activation shift, use argument `--correlation_chain`. 
 <p align="center">
