@@ -9,7 +9,7 @@ This implementation applies some optimizations from paper [Improving the Neural 
 </p>
 
 ### Evaluation for style layers
-To urun with multiple layers for style loss, use argument `--style_layers layers`
+To run with multiple layers for style loss, use argument `--style_layers layers`
 <p align="center">
 <img src="examples/evaluation/images/image5.png">
 </p>
